@@ -31,8 +31,15 @@ jobs:
           sleep 5
           curl http://localhost:3000/health || true
 
+      - name: Descargar e instalar K6
+        run: |
+          wget https://github.com/grafana/k6/releases/download/v0.50.0/k6-v0.50.0-linux-amd64.tar.gz
+          tar -xzf k6-v0.50.0-linux-amd64.tar.gz
+          chmod +x k6-v0.50.0-linux-amd64/k6
+          sudo mv k6-v0.50.0-linux-amd64/k6 /usr/local/bin/k6
+
       - name: Ejecutar pruebas K6 con Grafana Cloud
-        run: npm run test:load
+        run: k6 run --out cloud tests/load-tests.js
         env:
           BASE_URL: http://localhost:3000
           K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
